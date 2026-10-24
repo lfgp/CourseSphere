@@ -1,5 +1,6 @@
 firebase-admin
 flask
 flask-cors
+numpy
 openai
 pandas
