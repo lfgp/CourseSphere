@@ -1,7 +1,11 @@
 # Instalação #
 
 ## Frontend ##
+
+### Install dependencies ###
 npm install
+
+### Execute ###
 npm run dev
 
 ## Backend ##
