@@ -10,7 +10,7 @@ npm run dev
 
 ## Backend ##
 
-### Generate virtual environment###
+### Generate virtual environment ###
 py -m venv .venv
 
 ### Install dependencies ###
