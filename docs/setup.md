@@ -16,5 +16,5 @@ py -m venv .venv
 ### Install dependencies ###
 py -m pip install -r requirements.txt
 
-### Execute###
+### Execute ###
 py endpoints.py
