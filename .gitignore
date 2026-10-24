@@ -4,5 +4,5 @@
 *.vscode*
 
 *.db*
-
+/backend/.venv
 .DS_Store
