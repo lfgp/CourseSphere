@@ -422,7 +422,7 @@ O `pip-audit` encontrou no ambiente virtual `pip==26.1.2`, associado a `CVE-2026
 
 ## Melhorias complementares e cobertura do Top 10
 
-Uma etapa adicional implementou **rate limiting por IP/usuário** e **headers HTTP de segurança** como dois controles preventivos além do fluxo funcional original. A validação de inputs continua como controle complementar. O rate limiting mitiga abuso; não foi apresentado como solução completa de DoS nem como bloqueio de login no Firebase.
+Uma etapa adicional implementou **rate limiting por IP/usuário** e **headers HTTP de segurança** como dois controles preventivos além do fluxo funcional original. A configuração, o passo a passo de reprodução, os testes e os limites desses controles estão em [security-improvements.md](security-improvements.md). A validação de inputs continua como controle complementar. O rate limiting mitiga abuso; não foi apresentado como solução completa de DoS nem como bloqueio de login no Firebase
 
 Os IDs de mensagem agora usam `secrets.token_hex(32)` em vez de uma composição de aleatoriedade e hash. O frontend resolve o ID antes de serializar a mensagem, que antes podia conter uma `Promise` convertida em `{}`. Esse identificador não é hash de senha nem mecanismo de autorização, portanto a implementação anterior não foi apresentada como quebra criptográfica comprovada.
 
