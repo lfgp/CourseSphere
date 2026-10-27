@@ -1,0 +1,38 @@
+name: Dependency security (SCA)
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '20 10 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  npm-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SCA_OUTPUT_DIR: ${{ runner.temp }}/sca-reports
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Verify scanner failure policy
+        run: npm run test:sca
+      - name: Audit both npm lockfiles
+        run: npm run security:sca
+      - name: Attach SCA reports, including failed scans
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: sca-reports
+          path: ${{ runner.temp }}/sca-reports
+          if-no-files-found: warn
+          retention-days: 30
