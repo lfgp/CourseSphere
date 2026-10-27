@@ -29,7 +29,7 @@ Para esses cinco achados, a existência do mecanismo inseguro ou do componente a
 ### Convenções para reproduzir
 
 - Os passos marcados como **antes** descrevem o estado capturado anteriormente às correções. Executar os comandos na árvore atual deve produzir o resultado corrigido; não se deve desfazer as correções no ambiente de uso.
-- Para comparação dinâmica com o código antigo, use somente uma cópia isolada desse estado e os emuladores, sem credenciais reais. O estado inicial tinha alterações locais e não é necessariamente igual a `HEAD`; por isso, um checkout de `HEAD` não reproduz automaticamente toda a linha de base.
+- Para comparação dinâmica com o código antigo, use somente uma cópia isolada desse estado e os emuladores, sem credenciais reais. A linha de base inclui as alterações locais existentes na coleta; uma cópia atual do projeto não reproduz automaticamente o estado anterior.
 - `ID_TOKEN_LOCAL` significa um ID token de uma conta fictícia criada no emulador. Não é um token real fornecido por este documento. Os testes automatizados criam contas locais ou simulam a verificação do Firebase e não exigem copiar tokens de produção.
 - Execute os comandos HTTP apenas contra `127.0.0.1:5000`, conforme [setup.md](setup.md). Nas seções seguintes, **reprodução** demonstra a falha; **passo a passo aplicado** explica sua correção.
 
@@ -54,28 +54,7 @@ As correções de **V02, V04, V05 e V08** atendem ao mínimo solicitado, conside
 
 Outras causas também foram corrigidas, como a concatenação SQL (V03) e a validação tardia de lotes (parte de V06). Seus limites estão descritos nas respectivas seções. Limitar tamanho de corpo continua sendo mitigação de consumo de recursos; remover um arquivo com segredo continua exigindo revogação externa.
 
-### Organização dos commits
-
-Os commits desta entrega são agrupados por finalidade. A configuração local necessária aos testes acompanha os commits correspondentes; arquivos anteriores sem relação com as correções permanecem fora deles. Não foi feito push nem reescrita do histórico.
-
-| Commit | Mensagem | Escopo e relação com os achados |
-| --- | --- | --- |
-| `d758a4c` | `fix(deps): atualizar componentes vulneraveis e runtime do frontend` | V08: versões corrigidas, lockfiles, construção do frontend e infraestrutura de emuladores necessária à validação |
-| `510d9e0` | `fix(sql): parametrizar consultas e validar campos de atualizacao` | V03: causa da injeção retirada do módulo e das migrações, com testes SQLite separados; blueprint continua desativado |
-| `56cc195` | `fix(api): corrigir transporte de tokens, erros e politica CORS` | V02, V04 e V05: três correções da aplicação ativa; também inclui validação de entradas, autenticação e seus testes |
-| `cad3e40` | `fix(secrets): remover credencial Reddit da arvore versionada` | V09: remoção do segredo atual e exemplo seguro; **não comprova revogação e não entra nas três correções concluídas** |
-
-Um commit final, `docs(security): registrar causas raizes, correcoes e evidencias`, reúne este relatório, as evidências sanitizadas e o guia de configuração. Seu identificador pode ser consultado no log, sem criar uma referência circular dentro do próprio arquivo commitado.
-
-As mensagens incluem o motivo técnico e o escopo das mudanças. Os testes SQL acompanham seu commit; os testes de API e do cliente acompanham as correções da API. Para inspecionar a entrega:
-
-```powershell
-git log --oneline 71616a0..HEAD
-git show --stat d758a4c
-git show --stat 56cc195
-```
-
-As mudanças anteriores de carregamento de configuração em `backend/main.py`, o agregador de requisitos na raiz e o rascunho `docs/evidence/findings.md` foram preservados fora desses commits. No arquivo `main.py`, somente a substituição do gerador de IDs foi incluída no commit da API.
+As alterações técnicas, suas causas e os testes correspondentes estão detalhados nas seções de cada achado. A visão consolidada de segurança e confiabilidade está em [findings.md](evidence/findings.md).
 
 ## Inventário dos achados
 
@@ -364,13 +343,8 @@ O `pip-audit` encontrou no ambiente virtual `pip==26.1.2`, associado a `CVE-2026
 
 **Passos de reprodução sem publicar a credencial:**
 
-1. Confirmar a presença do arquivo na revisão Git sem imprimir seu conteúdo:
-
-   ```powershell
-   git cat-file -e 71616a0:backend/cornell-course-sphere-data/reddit-data/reddit_key.json
-   ```
-
-2. O código de saída `0` confirma que o objeto existe na revisão anterior `71616a0`, preservada no histórico. `HEAD` já inclui os novos commits e não deve ser usado como referência do arquivo antigo. A evidência [secret-review.json](evidence/secret-review.json) registra separadamente a revisão examinada e que os campos estavam preenchidos e não pareciam placeholders; o comando anterior sozinho não demonstra isso.
+1. Consultar [secret-review.json](evidence/secret-review.json), que registra a presença histórica do arquivo sem publicar seu conteúdo.
+2. Conferir `redditCredentialTrackedInReviewedHistory` e os indicadores de que os campos estavam preenchidos e não eram placeholders. Esses dados descrevem a coleta anterior; não indicam que a credencial esteja na árvore atual ou continue válida no provedor.
 3. A leitura controlada realizada na revisão permitiu verificar esses indicadores sem guardar os valores no relatório. Não copiar o segredo para a documentação, prints ou console compartilhado.
 4. Conferir que o arquivo real não está na árvore atual e que existe apenas o exemplo com placeholders. O objeto continua acessível no histórico, portanto essa reprodução histórica não deixa de funcionar apenas com a exclusão do arquivo atual.
 
@@ -387,7 +361,7 @@ O `pip-audit` encontrou no ambiente virtual `pip==26.1.2`, associado a `CVE-2026
 
 1. Revogar o segredo exposto nas configurações da aplicação no provedor e gerar um substituto.
 2. Verificar registros e consumo associados à credencial e investigar eventual uso indevido.
-3. Distribuir a nova credencial por um mecanismo privado, sem commitá-la.
+ Distribuir a nova credencial por um mecanismo privado, sem versioná-la.
 4. Se for necessário remover o conteúdo do histórico remoto, coordenar a reescrita com os colaboradores, considerando branches, tags, forks e clones. Não foi reescrito o histórico nesta revisão.
 
 **Por que não se pode chamar isso de resolvido:** o valor antigo permanece no histórico e em possíveis cópias. `.gitignore` não remove arquivos já versionados nem revoga segredos. A correção do arquivo atual é verificável; o encerramento da exposição depende da revogação, que não foi executada nem presumida. Mesmo limpar o histórico não substitui a rotação.
