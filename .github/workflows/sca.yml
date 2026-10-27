@@ -14,8 +14,7 @@ jobs:
   npm-audit:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    env:
-      SCA_OUTPUT_DIR: ${{ runner.temp }}/sca-reports
+
     steps:
       - uses: actions/checkout@v6
         with:
