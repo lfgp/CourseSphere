@@ -1,0 +1,12 @@
+{
+  "unauthenticated_query_status": 401,
+  "url_token_profile_status": 401,
+  "authenticated_profile_status": 200,
+  "internal_exception_disclosed": false,
+  "untrusted_cors_origin": null,
+  "authenticated_oversized_query_status": 413,
+  "authenticated_array_json_status": 400,
+  "profile_cache_control": "no-store",
+  "public_admin_signup_status": 404,
+  "method": "Flask test client with mocked Firebase, no real service accessed"
+}
