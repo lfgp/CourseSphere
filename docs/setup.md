@@ -8,6 +8,28 @@ O passo a passo das melhorias adicionais de **rate limiting** e **headers HTTP**
 
 Logs JSON, `/health`, `/metrics`, SLIs/SLOs e a proposta de dashboard estão em [observability.md](observability.md), com configuração de coleta e passos de validação.
 
+Para executar frontend, duas APIs, Nginx, Redis e Firebase emulado com Docker Compose, siga [containers.md](containers.md). O guia inclui a demonstração da distribuição entre as instâncias e o teste da cota compartilhada.
+
+## Execução com Docker Compose
+
+Com o Docker Desktop iniciado em modo Linux, na raiz do repositório:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/initialize-docker.ps1
+docker compose build backend-1 frontend firebase-emulators
+docker compose up -d --wait --wait-timeout 180 --no-build
+```
+
+Abra http://127.0.0.1:8080. O Compose usa o projeto fictício `demo-coursesphere`, duas APIs atrás do Nginx e Redis compartilhado por socket, sem credencial Firebase real. Os emuladores publicam somente `127.0.0.1:9099` e `127.0.0.1:9000`; pare antes uma execução local que esteja usando essas portas. Não é necessário iniciar os três terminais da instalação manual abaixo.
+
+Para comprovar o balanceamento e os fluxos compartilhados, com Node.js no host:
+
+```powershell
+npm run test:containers
+```
+
+O script mostra as identidades `backend-1` e `backend-2` em respostas HTTP reais e gera evidência sanitizada. Veja os limites e comandos de parada no [guia dos contêineres](containers.md).
+
 ## Execução local sem conta Firebase
 
 Este modo usa os emuladores oficiais de Authentication e Realtime Database com o projeto fictício `demo-coursesphere`. Não precisa de login no Firebase, `credentials.json` ou chave da OpenAI.
