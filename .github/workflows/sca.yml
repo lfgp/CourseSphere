@@ -14,24 +14,81 @@ jobs:
   npm-audit:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-
     steps:
       - uses: actions/checkout@v6
+        id: checkout
         with:
           persist-credentials: false
       - uses: actions/setup-node@v6
+        id: node
         with:
           node-version: '24'
           package-manager-cache: false
+      - name: Check required SCA files and commands
+        id: inputs
+        run: |
+          node --input-type=module <<'NODE'
+          import { existsSync, readFileSync } from 'node:fs';
+          const required = [
+            'package.json', 'package-lock.json',
+            'frontend/package.json', 'frontend/package-lock.json',
+            'scripts/security-sca.mjs', 'scripts/tests/security-sca.test.mjs',
+          ];
+          const missing = required.filter(file => !existsSync(file));
+          for (const file of missing) {
+            console.error(`::error file=${file}::Required SCA file is missing. Add it to this repository.`);
+          }
+          if (missing.length) process.exit(1);
+          const { scripts = {} } = JSON.parse(readFileSync('package.json', 'utf8'));
+          for (const name of ['test:sca', 'security:sca']) {
+            if (typeof scripts[name] !== 'string' || !scripts[name].trim()) {
+              console.error(`::error file=package.json::Missing npm script: ${name}. Update the root package.json.`);
+              process.exitCode = 1;
+            }
+          }
+          NODE
       - name: Verify scanner failure policy
+        id: policy
         run: npm run test:sca
       - name: Audit both npm lockfiles
+        id: audit
+        env:
+          SCA_OUTPUT_DIR: ${{ runner.temp }}/sca-reports
         run: npm run security:sca
+      - name: Record SCA execution status
+        if: always()
+        env:
+          SCA_OUTPUT_DIR: ${{ runner.temp }}/sca-reports
+          CHECKOUT_OUTCOME: ${{ steps.checkout.outcome }}
+          NODE_OUTCOME: ${{ steps.node.outcome }}
+          INPUTS_OUTCOME: ${{ steps.inputs.outcome }}
+          POLICY_OUTCOME: ${{ steps.policy.outcome }}
+          AUDIT_OUTCOME: ${{ steps.audit.outcome }}
+        run: |
+          mkdir -p "$SCA_OUTPUT_DIR"
+          missing=0
+          {
+            printf 'checkout=%s\nnode=%s\ninputs=%s\npolicy=%s\naudit=%s\n' \
+              "$CHECKOUT_OUTCOME" "$NODE_OUTCOME" "$INPUTS_OUTCOME" "$POLICY_OUTCOME" "$AUDIT_OUTCOME"
+            for file in sca-npm-root.json sca-npm-frontend.json sca-summary.json sca-execution.txt; do
+              if [ -s "$SCA_OUTPUT_DIR/$file" ]; then
+                printf '%s=present\n' "$file"
+              else
+                printf '%s=missing\n' "$file"
+                missing=1
+              fi
+            done
+          } > "$SCA_OUTPUT_DIR/sca-workflow-status.txt"
+          cat "$SCA_OUTPUT_DIR/sca-workflow-status.txt"
+          if [ "$missing" -ne 0 ]; then
+            echo '::error::SCA reports are incomplete. Check the first failed step; the audit results are not assessed.'
+            exit 1
+          fi
       - name: Attach SCA reports, including failed scans
         if: always()
         uses: actions/upload-artifact@v6
         with:
           name: sca-reports
           path: ${{ runner.temp }}/sca-reports
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 30
