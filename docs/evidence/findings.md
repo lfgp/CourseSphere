@@ -1,6 +1,6 @@
 # Relatório de segurança e confiabilidade — CourseSphere
 
-**Consolidação:** 27/10/2026, America/Fortaleza. **Formato:** Markdown. **Referência do código implementado:** commit `19a72e2`, acrescido dos ajustes locais de documentação. A linha de base histórica foi examinada antes dos commits de segurança e tinha alterações locais; não corresponde necessariamente a um checkout puro de um commit.
+**Consolidação:** 27/10/2026, America/Fortaleza. **Formato:** Markdown. **Escopo:** implementação e evidências presentes no repositório. A linha de base histórica corresponde ao estado examinado antes das correções de segurança, incluindo as alterações locais existentes na coleta.
 
 Este relatório reúne as evidências já registradas de revisão, testes locais e execução em Docker. Nesta consolidação não foram repetidos os testes dinâmicos nem as auditorias de dependências. Os resultados abaixo descrevem aquelas execuções, e não uma verificação de produção ou uma garantia de que serviços continuam disponíveis neste momento.
 
@@ -133,7 +133,7 @@ O trecho reúne campos reais de duas capturas; não é uma resposta HTTP complet
 
 **Descrição e causa raiz:** `backend/cornell-course-sphere-data/reddit-data/reddit_key.json` foi versionado com `client_id` e `client_secret` preenchidos, sem indicação de placeholders. O mecanismo de distribuição de segredos permitia incluir uma credencial no Git.
 
-**Reprodução segura:** consultar os indicadores em [secret-review.json](secret-review.json) e o histórico do caminho com `git log --all -- backend/cornell-course-sphere-data/reddit-data/reddit_key.json`, sem imprimir o conteúdo do arquivo. A revisão histórica examinada foi `71616a08b8756f048d5bf237be433c3b996a43d1`. O campo `redditCredentialTrackedInHEAD: true` refere-se ao HEAD daquela coleta, não ao HEAD atual.
+**Reprodução segura:** consultar os indicadores em [secret-review.json](secret-review.json) e verificar a presença histórica do arquivo no material analisado, sem imprimir seu conteúdo. O campo `redditCredentialTrackedInReviewedHistory: true` descreve o histórico inspecionado na coleta; não afirma que o arquivo permanece na árvore atual.
 
 **Evidência:** o relatório sanitizado marca os dois campos como preenchidos e não placeholders e registra ausência do arquivo na árvore de trabalho após a retirada. Nenhum valor do segredo é publicado. Não houve chamada ao Reddit para testar se ele ainda é aceito.
 
