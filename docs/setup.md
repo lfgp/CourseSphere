@@ -200,7 +200,14 @@ O ambiente virtual utilizado nesta revisão tinha uma versão vulnerável do `pi
 .\.venv\Scripts\python.exe -m pip check
 ```
 
-Execute `npm audit` na raiz e em `frontend`. Use `npm ci` com os lockfiles versionados. O lockfile alternativo do Bun foi retirado para evitar instalar novamente a árvore antiga.
+Para a SCA npm configurada no repositório, execute na raiz:
+
+```powershell
+npm run test:sca
+npm run security:sca
+```
+
+O comando audita os lockfiles da raiz e do frontend, inclui dependências de desenvolvimento e grava os resultados em `docs/evidence/sca-*.json` e `sca-execution.txt`. O [guia de SCA](sca.md) explica os códigos de saída, o workflow preparado e os limites da análise. Use `npm ci` com os lockfiles versionados para instalar a aplicação. O lockfile alternativo do Bun foi retirado para evitar instalar novamente a árvore antiga.
 
 ### Credenciais da coleta do Reddit
 
