@@ -1,0 +1,10 @@
+{
+  "unauthenticated_query_status": 200,
+  "url_token_profile_status": 200,
+  "internal_exception_disclosed": true,
+  "untrusted_cors_origin": "https://untrusted.example",
+  "oversized_query_status": 200,
+  "array_json_status": 500,
+  "profile_cache_control": null,
+  "method": "Flask test client with mocked Firebase, no real service accessed"
+}

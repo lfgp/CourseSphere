@@ -21,7 +21,7 @@ import SearchIcon from "@mui/icons-material/Search";
 
 
 
-const MajorSelection = (props: {majors: string[], setMajors: Function}) => {
+const MajorSelection = (props: {majors: string[], setMajors: (values: string[]) => void}) => {
   const {majors, setMajors} = props;
   return (
     <Autocomplete
@@ -35,7 +35,7 @@ const MajorSelection = (props: {majors: string[], setMajors: Function}) => {
       options={majorOptions}
       getOptionLabel={(option) => option}
       value={majors}
-      onChange={(event, newValue: string[]) => {
+      onChange={(_event, newValue: string[]) => {
         setMajors(newValue);
       }}
       renderTags={(value, getTagProps) =>
@@ -55,7 +55,7 @@ const MajorSelection = (props: {majors: string[], setMajors: Function}) => {
   );
 };
 
-const MinorSelection = (props: {minors: string[], setMinors: Function}) => {
+const MinorSelection = (props: {minors: string[], setMinors: (values: string[]) => void}) => {
   const {minors, setMinors} = props
 
   return (
@@ -69,7 +69,7 @@ const MinorSelection = (props: {minors: string[], setMinors: Function}) => {
       options={minorOptions}
       getOptionLabel={(option) => option}
       value={minors}
-      onChange={(event, newValue: string[]) => {
+      onChange={(_event, newValue: string[]) => {
         setMinors(newValue);
       }}
       renderTags={(value, getTagProps) =>
@@ -103,7 +103,7 @@ const collegeOptions = [
   "Cornell SC Johnson College of Business",
 ];
 
-const YearSelection = (props: {year: string, setYear: Function}) => {
+const YearSelection = (props: {year: string, setYear: (value: string) => void}) => {
   const {year, setYear} = props
   return (
     <Autocomplete
@@ -111,8 +111,8 @@ const YearSelection = (props: {year: string, setYear: Function}) => {
       id = "year-output"
       disablePortal 
       value = {year}
-      onChange = {(event, newValue) => {
-        setYear(newValue)
+      onChange = {(_event, newValue) => {
+        setYear(newValue || '')
       }}
       options={yearOptions}
       sx={{ width: 200 }}
@@ -121,15 +121,15 @@ const YearSelection = (props: {year: string, setYear: Function}) => {
   );
 };
 
-const CollegeSelection = (props: {college: string, setCollege: Function}) => {
+const CollegeSelection = (props: {college: string, setCollege: (value: string) => void}) => {
   const {college, setCollege} = props
   return (
     <Autocomplete
       className="selector"
       id = "college-output"
       value = {college}
-      onChange = {(event, newValue) => {
-        setCollege(newValue)
+      onChange = {(_event, newValue) => {
+        setCollege(newValue || '')
       }}
       disablePortal
       options={collegeOptions}
@@ -140,14 +140,14 @@ const CollegeSelection = (props: {college: string, setCollege: Function}) => {
     />);
 };
 
-const CourseList = (props: {courses: string[], handleRemove: Function}) => {
+const CourseList = (props: {courses: string[], handleRemove: (course: string) => void}) => {
   const {courses, handleRemove} = props;
   return (
     <Box
       sx={{ flex: "1 1 auto", height: 200, width: 300, overflow: "auto" }}
     >
       <List>
-        {Array.from(courses).map((course, index: any) => (
+        {Array.from(courses).map((course, index) => (
           <ListItem
             key={index}
             secondaryAction={
@@ -168,7 +168,7 @@ const CourseList = (props: {courses: string[], handleRemove: Function}) => {
   );
 };
 
-const CoursesInput = (props: {courses: string[], setCourses: Function}) => {
+const CoursesInput = (props: {courses: string[], setCourses: (values: string[]) => void}) => {
   const [course, setCourse] = useState<string>("");
   const {courses, setCourses} = props;
 
@@ -186,7 +186,7 @@ const CoursesInput = (props: {courses: string[], setCourses: Function}) => {
             options={allCornellCourses}
             value={course}
             id = "courses-output"
-            onChange={(event: any, newValue: string | null) => {
+            onChange={(_event, newValue: string | null) => {
               if (newValue) {
                 setCourse(newValue);
                 const newSet:string[] = Array.from(courses);
@@ -216,7 +216,7 @@ const CoursesInput = (props: {courses: string[], setCourses: Function}) => {
   );
 };
 
-const TellMeAboutYourself = (props: {about: string, setCourses: Function}) => {
+const TellMeAboutYourself = ({about, setAbout}: {about: string, setAbout: (value: string) => void}) => {
   return (
     <Grid item xs={12}>
       <Typography variant="h6">Tell me about yourself</Typography>
@@ -230,6 +230,8 @@ const TellMeAboutYourself = (props: {about: string, setCourses: Function}) => {
       </Typography>
       <TextField
         id = "info-output"
+        value={about}
+        onChange={(event) => setAbout(event.target.value)}
         multiline
         fullWidth
         rows={4}

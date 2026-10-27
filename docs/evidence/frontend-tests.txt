@@ -1,0 +1,17 @@
+
+> coursesphere@0.0.0 test
+> node --test tests/*.test.cjs
+
+✔ query waits for the ID token and sends it only in Authorization (78.6655ms)
+✔ signed-out requests fail before fetch (21.1881ms)
+✔ absolute and protocol-relative paths cannot receive the token (11.5684ms)
+✔ HTTP failure is rejected instead of being presented as successful data (8.6841ms)
+✔ registration calls the Firebase client SDK without an Admin API request (10.3798ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 960.2552

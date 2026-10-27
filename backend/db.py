@@ -1,15 +1,16 @@
 import sqlite3
+from pathlib import Path 
 
 def create_connection():
-    return sqlite3.connect("cournell-course-sphere-data/roster_reviews.sqlite.db")
+    path = Path(__file__).resolve().parent / 'cornell-course-sphere-data' / 'course-roster-kaggle' / 'roster_reviews.sqlite.db'
+    return sqlite3.connect(path)
 
-def execute_query(query):
+def execute_query(query, parameters=()): # correção da sql injection utilizada anteriormente
     conn = create_connection()
-    cursor = conn.cursor()
-    res = cursor.execute(query)
-    conn.commit()
-    conn.close()
-    return res
-
-if __name__ == '__main__':
-    execute_query()
+    conn.row_factory = sqlite3.Row
+    try:
+        with conn:
+            cursor = conn.execute(query, parameters)
+            return [dict(row) for row in cursor.fetchall()]
+    finally:
+        conn.close()

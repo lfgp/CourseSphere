@@ -45,20 +45,19 @@ export default function ChatInterface() {
     event.preventDefault();
     if (query.trim() === '') return;
 
-    const newResponses: Response[] = [...responses, { user: query }];
-    const userMessage: Message = {
-      sender: 'user',
-      content: query,
-      messageID: h(query),
-      timestamp: new Date().toISOString(),
-    };
-
     try {
+      const newResponses: Response[] = [...responses, { user: query }];
+      const userMessage: Message = {
+        sender: 'user',
+        content: query,
+        messageID: await h(query),
+        timestamp: new Date().toISOString(),
+      };
       const { botResponse, newRecommendations } = await fetchCourseSphereResponse(query);
       const botMessage: Message = {
         sender: 'bot',
         content: { botResponse, newRecommendations },
-        messageID: h({botResponse, newRecommendations}),
+        messageID: await h({botResponse, newRecommendations}),
         timestamp: new Date().toISOString(),
       };
 

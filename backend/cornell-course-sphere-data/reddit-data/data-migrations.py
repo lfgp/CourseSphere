@@ -228,6 +228,11 @@ class DataMigrations:
         :param post_id: The ID of the post to update.
         :param kwargs: The fields to update.
         """
+        allowed_fields = {field.name for field in dataclasses.fields(RedditPost)} - {'post_id', 'comments'} # limita campos permitidos para evitar sql injection
+        if not kwargs or set(kwargs) - allowed_fields:
+            raise ValueError('Invalid post update fields')
+
+        # Validate identifiers before any mutation; values alone can use SQL placeholders.
         # Delete associated comments first
         delete_comments_sql = f"DELETE FROM {self.table_names['comments']} WHERE post_id = ?"
         self.cursor.execute(delete_comments_sql, (post_id,))

@@ -1,10 +1,46 @@
 # firebase.py
+import os
+from pathlib import Path
+
 import firebase_admin
 from firebase_admin import credentials, auth, db
-firebase_credentials = credentials.Certificate("./credentials.json")
-database_url = "https://coursesphere-8bd9a-default-rtdb.firebaseio.com"
-firebase_admin.initialize_app(firebase_credentials, {"databaseURL": database_url})
-firebase_app = firebase_admin.get_app()
+from validation import validate_key, validate_messages, validate_profile
+
+if os.environ.get("COURSESPHERE_LOCAL") == "1":
+     # The alternate host is exclusively the emulator service in the local Compose network.
+    emulator_host = os.environ.get('COURSESPHERE_EMULATOR_HOST', '127.0.0.1')
+    if emulator_host not in {'127.0.0.1', 'firebase-emulators'}:
+        raise ValueError('Invalid local emulator host; use loopback or the Compose emulator service.')
+    os.environ["FIREBASE_AUTH_EMULATOR_HOST"] = f"{emulator_host}:9099"
+    os.environ["FIREBASE_DATABASE_EMULATOR_HOST"] = f"{emulator_host}:9000"
+    firebase_app = firebase_admin.initialize_app(options={
+        "projectId": "demo-coursesphere",
+        "databaseURL": "https://demo-coursesphere-default-rtdb.firebaseio.com",
+    })
+else:
+    if os.environ.get('FIREBASE_AUTH_EMULATOR_HOST') or os.environ.get('FIREBASE_DATABASE_EMULATOR_HOST'):
+        raise RuntimeError('Firebase emulator configuration is forbidden outside COURSESPHERE_LOCAL=1.')
+    credentials_path = Path(
+        os.environ.get(
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            str(Path(__file__).resolve().parent / "credentials.json"),
+        )
+    ).expanduser()
+    if not credentials_path.is_file():
+        raise FileNotFoundError(
+            f"Firebase service account JSON not found: {credentials_path}. "
+            "For local development, start npm run emulators in the repository root "
+            "and run python endpoints.py (local mode by default). For a real Firebase project, "
+            "save the service account JSON as backend/credentials.json or set "
+            "GOOGLE_APPLICATION_CREDENTIALS to its full path. See docs/setup.md."
+        )
+
+    firebase_credentials = credentials.Certificate(str(credentials_path))
+    database_url = os.environ.get(
+        "FIREBASE_DATABASE_URL",
+        "https://coursesphere-8bd9a-default-rtdb.firebaseio.com",
+    )
+    firebase_app = firebase_admin.initialize_app(firebase_credentials, {"databaseURL": database_url})
 
 class Firebase:
     @staticmethod
@@ -31,14 +67,12 @@ class Firebase:
 
     @staticmethod
     def verify_id_token(id_token: str):
-        try:
-            decoded_token = auth.verify_id_token(id_token)
-            return decoded_token
-        except Exception as e:
-            raise Exception(f"Error verifying ID token: {str(e)}")
+        return auth.verify_id_token(id_token, check_revoked=True)
 
     @staticmethod
     def set_user_info(uid: str, user_info: dict):
+        validate_key(uid)
+        user_info = validate_profile(user_info)
         try:
             ref = db.reference(f"users/{uid}/info")
             ref.set(user_info)
@@ -47,6 +81,7 @@ class Firebase:
 
     @staticmethod
     def get_user_info(uid: str):
+        validate_key(uid)
         try:
             ref = db.reference(f"users/{uid}/info")
             user_info = ref.get()
@@ -54,15 +89,6 @@ class Firebase:
         except Exception as e:
             raise Exception(f"Error getting user info: {str(e)}")
         
-    @staticmethod
-    def try_get_user_info(id_token):
-        try:
-            return Firebase.get_user_info(Firebase.verify_id_token(id_token).get('uid'))
-        except Exception:
-            return None
-
-
-
     @staticmethod
     def update_user_info(uid: str, updates: dict):
         try:
@@ -134,6 +160,9 @@ class Firebase:
 
     @staticmethod
     def save_chat(uid: str, chat_id: str, messages: list):
+        validate_key(uid)
+        validate_key(chat_id)
+        validate_messages(messages)  # Validate the complete batch before the first write.
         try:
             ref = db.reference(f"users/{uid}/chats/{chat_id}/messages")
             
@@ -151,6 +180,8 @@ class Firebase:
 
     @staticmethod
     def delete_chat(uid: str, chat_id: str):
+        validate_key(uid)
+        validate_key(chat_id)
         try:
             ref = db.reference(f"users/{uid}/chats/{chat_id}")
             ref.delete()  # Deletes the entire chat session

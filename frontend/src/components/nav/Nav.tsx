@@ -10,19 +10,11 @@ import {
   ListItemText,
   Toolbar,
   Typography,
-  Hidden,
-  useMediaQuery,
-  useTheme
+  Hidden
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Auth, getAuth, onAuthStateChanged } from 'firebase/auth';
-import { FirebaseApp, initializeApp } from 'firebase/app';
-import { Database, getDatabase } from 'firebase/database';
-import firebaseConfig from '../../firebaseConfig';
-
-const app: FirebaseApp = initializeApp(firebaseConfig);
-const database: Database = getDatabase(app);
-const auth: Auth = getAuth();
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../../firebase';
 
 function NavLink(props: { text: string, path: string }) {
   return (
@@ -59,10 +51,7 @@ export default function Nav() {
     });
   }, []);
 
-  const toggleDrawer = (open: boolean) => (event: any) => {
-    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-      return;
-    }
+  const toggleDrawer = (open: boolean) => () => {
     setDrawerOpen(open);
   };
 
@@ -85,9 +74,6 @@ export default function Nav() {
       )}
     </List>
   );
-
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
     <AppBar position="static">

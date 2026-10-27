@@ -1,0 +1,17 @@
+{
+  "name": "coursesphere-local",
+  "private": true,
+  "scripts": {
+    "emulators": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-emulators.ps1",
+    "test:containers": "node scripts/check-load-balancing.mjs --functional",
+    "security:sca": "node scripts/security-sca.mjs",
+    "test:sca": "node --test scripts/tests/security-sca.test.mjs"
+  },
+  "devDependencies": {
+    "firebase-tools": "15.34.1"
+  },
+  "overrides": {
+    "@opentelemetry/core": "^2.8.0",
+    "uuid": "^11.1.1"
+  }
+}

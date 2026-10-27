@@ -1,14 +1,9 @@
 import { useEffect, useState } from 'react';
 import { List, ListItem, ListItemText, Typography } from '@mui/material';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { getDatabase } from 'firebase/database';
+import { onAuthStateChanged } from 'firebase/auth';
 import { toast } from 'react-toastify';
-import { initializeApp } from "firebase/app";
-import firebaseConfig from "../../firebaseConfig";
-
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
-const auth = getAuth(app);
+import { auth } from "../../firebase";
+import { apiRequest } from '../../api';
 
 export default function UserChats() {
   const [chats, setChats] = useState<Chat[]>([]);
@@ -21,20 +16,7 @@ export default function UserChats() {
         if (user) {
           setIsLoggedIn(true);
           try {
-            const idToken = await user.getIdToken();
-            const response = await fetch("http://127.0.0.1:5000/theactualbackendlink", {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${idToken}`,
-              },
-            });
-
-            if (!response.ok) {
-              throw new Error('Network response was not ok');
-            }
-
-            const data = await response.json();
+            const data = await apiRequest('/theactualbackendlink');
             setChats(data.chats); 
             toast.success("Successfully fetched your chats!");
           } catch (error) {

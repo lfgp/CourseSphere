@@ -1,0 +1,8 @@
+{
+  "tests_run": 27,
+  "failures": [],
+  "errors": [],
+  "skipped": [],
+  "successful": true,
+  "scope": "Local Firebase Authentication and RTDB emulators, Flask test client, temporary SQLite database"
+}

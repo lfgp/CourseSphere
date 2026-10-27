@@ -1,0 +1,20 @@
+{
+  "checks_passed": true,
+  "results": [
+    {
+      "target": "vite-development",
+      "status": 200,
+      "common_headers": true,
+      "emulator_connections_permitted_by_policy": true
+    },
+    {
+      "target": "vite-production-preview",
+      "status": 200,
+      "entry_asset_status": 200,
+      "common_headers": true,
+      "nginx_policy_matches": true,
+      "inline_scripts_disallowed_by_policy": true
+    }
+  ],
+  "limitation": "HTTP responses and CSP configuration verified; no browser attack or Nginx container was executed."
+}
