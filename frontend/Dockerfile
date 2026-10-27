@@ -1,5 +1,5 @@
 # Use an official Node.js image as the base
-FROM node:16-alpine
+FROM node:24-alpine AS build
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -8,8 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
-RUN npm install -g serve
+RUN npm ci
 
 # Copy the rest of the app's source code to the working directory
 COPY . .
@@ -17,8 +16,7 @@ COPY . .
 # Build the app
 RUN npm run build
 
-# Expose the port that the app will run on
+FROM nginx:stable-alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 3000
-
-# Define the command to run the app
-CMD ["serve", "-s", "dist", "-l", "3000"]
