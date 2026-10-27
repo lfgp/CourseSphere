@@ -31,6 +31,7 @@ interface CourseRecommendation {
   data: {
     name: string;
     type: string;
+    sectionNumber: string;
     location: string;
     days: string;
     time: string;
@@ -69,6 +70,6 @@ type Content = string | { botResponse: string; newRecommendations: (CourseRecomm
 interface Message {
   sender: string;
   content: Content;
-  messageID: Promise<string | undefined>;
+  messageID: string;
   timestamp: string;
 }
