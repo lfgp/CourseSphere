@@ -20,6 +20,10 @@ def storage_uri_from_environment():
         url.port  # Validate malformed ports without echoing the URI on failure.
     except ValueError:
         raise ValueError('Invalid rate-limit storage configuration.') from None
+    if url.scheme == 'redis+unix':
+        if url.netloc or not url.path.startswith('/') or url.path == '/' or url.query or url.fragment:
+            raise ValueError('Redis Unix storage requires an absolute socket path without authority or query.')
+        return uri
     if url.scheme not in {'redis', 'rediss'} or not url.hostname or url.fragment:
         raise ValueError('Set COURSESPHERE_RATE_LIMIT_STORAGE_URI to a shared Redis URL; memory:// is local-only.')
     if url.scheme == 'redis' and url.hostname not in {'localhost', '127.0.0.1', '::1'}:
