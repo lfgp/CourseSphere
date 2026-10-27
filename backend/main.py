@@ -1,29 +1,18 @@
 from openai import OpenAI
 import json
-import hashlib as h
-import numpy as np
-import random as rv
 import secrets as st
-import string as s
+from pathlib import Path
 
-def shuffle(p: str) -> str:
-    char_list = list(p)
-    rv.shuffle(char_list)
-    return ''.join(char_list)
+BACKEND_DIR = Path(__file__).resolve().parent
 
 def hashFunction(data) -> str:
-    x = h.sha256((str(data) + ''.join(rv.choices(s.ascii_letters + s.digits, k=rv.randint(5,9)))).encode()).hexdigest()
-    w = str(sum(np.random.poisson(lam=i) for i in range(rv.randint(1, 5))))
-    b = st.token_hex(16) 
-    return shuffle(f"{w}{x}+{b}")
+    """Generate an opaque message ID; this function is not a password hash."""
+    return st.token_hex(32)
 
-
-config = json.load(open("./config.json", "r"))
-client = OpenAI(api_key = config['openai_api_key'])
-question_types = json.load(open("query_types.json", "r"))
-query = ""
 
 def make_prompt(query: str):
+    with (BACKEND_DIR / "query_types.json").open(encoding="utf-8") as file:
+        question_types = json.load(file)
     return ("""
     Respond to this prompt with a JSON object ONLY! No other output.
                     
@@ -49,13 +38,15 @@ def make_prompt(query: str):
     """)
 
 def get_query_details(query: str) -> dict:
+    with (BACKEND_DIR / "config.json").open(encoding="utf-8") as file:
+        config = json.load(file)
+    client = OpenAI(api_key=config['openai_api_key'])
     response = client.completions.create(
         model = "gpt-3.5-turbo-instruct",
         prompt = make_prompt(query),
         max_tokens=1000
     )
     return json.loads(response.to_dict()['choices'][0]['text'])
-response = get_query_details(query)
-print(response)
-
-
+if __name__ == "__main__":
+    response = get_query_details("")
+    print(response)
