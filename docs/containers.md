@@ -184,4 +184,4 @@ As evidências desta etapa ficam em `docs/evidence/`:
 
 O arquivo de demonstração é atualizado ao repetir o script; os relatórios históricos das etapas anteriores permanecem separados. A auditoria do ambiente Python não equivale a um scan dos pacotes de sistema das imagens.
 
-Os arquivos e commits estão divididos na [checklist](commit-checklist.md). Logs brutos de construção/depuração e o segredo ficam somente em `.tools/`, fora do Git. Resultados executados e eventuais limites de validação devem ser lidos junto das evidências, sem inferir desempenho de produção ou garantia de disponibilidade a partir de oito chamadas.
+Logs brutos de construção/depuração e o segredo ficam somente em `.tools/`, fora do Git. Resultados executados e eventuais limites de validação devem ser lidos junto das evidências, sem inferir desempenho de produção ou garantia de disponibilidade a partir de oito chamadas.
