@@ -422,7 +422,7 @@ O `pip-audit` encontrou no ambiente virtual `pip==26.1.2`, associado a `CVE-2026
 
 ## Melhorias complementares e cobertura do Top 10
 
-Uma etapa adicional implementou **rate limiting por IP/usuário** e **headers HTTP de segurança** como dois controles preventivos além do fluxo funcional original. A configuração, o passo a passo de reprodução, os testes e os limites desses controles estão em [security-improvements.md](security-improvements.md), com os arquivos e commits na [checklist](commit-checklist.md). A validação de inputs continua como controle complementar. O rate limiting mitiga abuso; não foi apresentado como solução completa de DoS nem como bloqueio de login no Firebase.
+Uma etapa adicional implementou **rate limiting por IP/usuário** e **headers HTTP de segurança** como dois controles preventivos além do fluxo funcional original. A validação de inputs continua como controle complementar. O rate limiting mitiga abuso; não foi apresentado como solução completa de DoS nem como bloqueio de login no Firebase.
 
 Os IDs de mensagem agora usam `secrets.token_hex(32)` em vez de uma composição de aleatoriedade e hash. O frontend resolve o ID antes de serializar a mensagem, que antes podia conter uma `Promise` convertida em `{}`. Esse identificador não é hash de senha nem mecanismo de autorização, portanto a implementação anterior não foi apresentada como quebra criptográfica comprovada.
 
@@ -506,7 +506,7 @@ O relatório inicial de integração teve um erro de isolamento do teste de conf
 
 1. **Revogar a credencial exposta do Reddit** e avaliar seu uso. É a pendência diretamente relacionada a uma exposição já confirmada.
 2. Publicar as regras de banco revisadas em um projeto real somente pelo processo de implantação apropriado. O teste local não comprova quais regras estão hoje em produção; o Admin SDK tem privilégios que exigem autorização na própria API.
-3. Configurar HTTPS, proxy `/api/`, servidor WSGI e limites no gateway. O rate limiting por IP/usuário já está implementado na API; configurar e validar o Redis compartilhado na implantação e calibrar as cotas. Não foi alegada uma solução completa contra DoS.
+O [ambiente local com Docker Compose](containers.md) implementa proxy `/api/`, Nginx com duas APIs Waitress e Redis compartilhado por socket Unix. HTTPS, limites adicionais no gateway, calibração de cotas e validação no ambiente real continuam pendentes de implantação. Contêineres e balanceamento não substituem as correções da lógica da aplicação nem constituem solução completa contra DoS.
 4. Conferir política de senhas, proteção contra enumeração, verificação de e-mail e controles de abuso do Firebase Authentication real.
 5. Os logs de requisições, erros e verificação de tokens agora são JSON, com métricas e sonda de vida implementadas; veja [observability.md](observability.md) e as [evidências de 51 testes](evidence/observability-tests.json). Ainda é necessário implantar a coleta central, retenção, alertas e o dashboard, além de verificar a redação de credenciais nos logs de gateway. O próprio Firebase CLI em modo diagnóstico pode imprimir o ambiente; esses logs brutos não são evidências versionadas desta revisão. Observabilidade não substitui as correções de causa raiz descritas neste relatório.
 6. Manter atualização e auditoria de dependências. A auditoria Python do ambiente instalado não inclui automaticamente todos os scripts auxiliares e notebooks.
