@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 
 from flask import g, has_request_context, request
 
-FIELDS = {'request_id', 'method', 'route', 'status', 'duration_ms', 'outcome', 'reason', 'kind', 'mode'}
+FIELDS = {'request_id', 'method', 'route', 'status', 'duration_ms', 'outcome', 'reason', 'kind', 'mode', 'instance'}
 METHODS = {'GET', 'POST', 'DELETE', 'PUT', 'PATCH', 'HEAD', 'OPTIONS'}
 
 
@@ -36,7 +36,7 @@ class JSONFormatter(logging.Formatter):
 def configure_logging(app):
     handler = logging.StreamHandler(sys.stdout)
     handler.setFormatter(JSONFormatter())
-    for logger in (app.logger, logging.getLogger('werkzeug')):
+    for logger in (app.logger, logging.getLogger('werkzeug'), logging.getLogger('waitress')):
         logger.handlers.clear()
         logger.addHandler(handler)
         logger.setLevel(logging.INFO if logger is app.logger else logging.WARNING)
@@ -44,4 +44,5 @@ def configure_logging(app):
 
 
 def log_event(app, event, level=logging.INFO, **fields):
-    app.logger.log(level, event, extra={'event_name': event, 'event_fields': {**request_context(), **fields}})
+    app.logger.log(level, event, extra={'event_name': event, 'event_fields': {
+        **request_context(), **fields, 'instance': app.config['COURSESPHERE_INSTANCE_ID']}})
