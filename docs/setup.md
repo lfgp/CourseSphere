@@ -4,7 +4,7 @@ Execute os comandos no PowerShell, a partir da raiz do repositório.
 
 As correções de segurança, suas reproduções e os testes estão em [vulnerabilities.md](vulnerabilities.md).
 
-O passo a passo das melhorias adicionais de **rate limiting** e **headers HTTP** está em [security-improvements.md](security-improvements.md). Os arquivos e commits de cada parte estão em [commit-checklist.md](commit-checklist.md).
+O passo a passo das melhorias adicionais de **rate limiting** e **headers HTTP** está em [security-improvements.md](security-improvements.md).
 
 Logs JSON, `/health`, `/metrics`, SLIs/SLOs e a proposta de dashboard estão em [observability.md](observability.md), com configuração de coleta e passos de validação.
 
