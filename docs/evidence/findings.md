@@ -2,7 +2,7 @@
 
 **Consolidação:** 27/10/2026, America/Fortaleza. **Formato:** Markdown. **Escopo:** implementação e evidências presentes no repositório. A linha de base histórica corresponde ao estado examinado antes das correções de segurança, incluindo as alterações locais existentes na coleta.
 
-Este relatório reúne as evidências já registradas de revisão, testes locais e execução em Docker. Nesta consolidação não foram repetidos os testes dinâmicos nem as auditorias de dependências. Os resultados abaixo descrevem aquelas execuções, e não uma verificação de produção ou uma garantia de que serviços continuam disponíveis neste momento.
+Este relatório reúne as evidências de revisão, testes locais e execução em Docker. A atualização de SCA da seção 4.1 documenta uma nova execução de auditoria npm em 27/10/2026; os testes dinâmicos da aplicação não foram repetidos. Os resultados descrevem as execuções identificadas, não uma verificação de produção ou uma garantia de que serviços continuam disponíveis neste momento.
 
 ## 1. Síntese para gestão
 
@@ -169,6 +169,7 @@ Passos e causas detalhados estão em [vulnerabilities.md](../vulnerabilities.md)
 | E06 | [frontend-tests-security-improvements.txt](frontend-tests-security-improvements.txt): 5 testes do cliente; [security-headers-frontend.json](security-headers-frontend.json): verificação HTTP de headers | Ataques completos em navegador; é uma etapa anterior, separada dos 57 testes |
 | E07 | [docker-load-balancing.txt](docker-load-balancing.txt) / [JSON](docker-load-balancing.json): requisições por ambas as APIs, perfil compartilhado e 20 respostas `200` + 2 `429` | Throughput, sobrevivência à queda de uma réplica ou de um host |
 | E08 | [docker-runtime.json](docker-runtime.json): seis serviços saudáveis na captura, UIDs 10001/101 e oito IDs correlacionados entre gateway/API | Estado online atual, backup recuperável ou segurança completa dos contêineres |
+| E09 | [sca-summary.json](sca-summary.json), [raiz](sca-npm-root.json), [frontend](sca-npm-frontend.json) e [saída](sca-execution.txt): execução da ferramenta SCA configurada no repositório | Análise de código, dependências Python, sistema operacional das imagens ou execução do workflow remoto |
 
 Trecho **literal** da demonstração HTTP registrada em E07:
 
@@ -181,6 +182,19 @@ shared_profile=ok shared_redis_quota=20 accepted, 2 rejected across both instanc
 Os dois primeiros registros são linhas consecutivas da amostra; a última linha é um resumo posterior do mesmo arquivo. E08 confirma status `200` no gateway e na API para cada ID. Não há screenshots fabricadas: logs, resultados de requests e arquivos de testes/auditoria constituem as evidências disponíveis. Os relatórios intermediários de 27, 38 e 51 testes são históricos e sobrepostos; não devem ser somados aos 57 como execuções independentes.
 
 Para revisão técnica, a preparação e os comandos estão em [setup.md](../setup.md), [security-improvements.md](../security-improvements.md) e [containers.md](../containers.md). Reexecutar testes atualiza a observação; não recria automaticamente a linha de base antiga.
+
+### 4.1 Ferramenta SCA configurada e execução anexada
+
+Foi configurado **npm audit**, por meio de `npm run security:sca` na raiz. O script [security-sca.mjs](../../scripts/security-sca.mjs) audita os dois lockfiles, inclui todos os tipos de dependência, grava evidências e retorna falha por achados a partir de severidade baixa ou por execução inconclusiva. O [workflow](../../.github/workflows/sca.yml) prepara a mesma análise em GitHub Actions, sem depender da conta de origem.
+
+| Execução local de 27/10/2026 | Dependências contabilizadas pelo npm | Avisos conhecidos | Status |
+| --- | --- | --- | --- |
+| Raiz/Firebase CLI | 632 | 0 | Aprovado |
+| Frontend | 421 | 0 | Aprovado |
+
+A ferramenta usada foi npm **11.17.0**, em Node **v24.19.0**. O comando encerrou com código `0`; os quatro testes da política de falha do scanner também passaram. Erro de rede, relatório inválido ou consulta interrompida não são classificados como auditoria limpa. A contagem não deve ser confundida com pacotes únicos entre os dois projetos.
+
+A execução remota do workflow não foi realizada: apenas a execução local está comprovada pelos anexos E09. Esta SCA não reexecuta os 57 testes históricos do backend nem audita Python ou pacotes de sistema das imagens. A configuração, o passo a passo e os limites completos estão em [sca.md](../sca.md).
 
 ## 5. Confiabilidade: SLIs e SLOs propostos
 
