@@ -3,6 +3,7 @@ import logging
 import os
 import re
 import secrets
+from pathlib import Path
 from time import perf_counter
 
 from flask import Response, g, jsonify, request
@@ -18,7 +19,20 @@ BUCKETS = (.005, .01, .025, .05, .1, .25, .5, 1, 2.5, 5, 10)
 
 def metrics_token_from_environment():
     token = os.environ.get('COURSESPHERE_METRICS_TOKEN', '')
-    if not token and os.environ.get('COURSESPHERE_LOCAL') == '1':
+    token_file = os.environ.get('COURSESPHERE_METRICS_TOKEN_FILE', '')
+    if token_file:
+        if token:
+            raise ValueError('Configure only one metrics token source.')
+        try:
+            # Refuse arbitrarily large files and never echo their path or contents on error.
+            with Path(token_file).open('r', encoding='utf-8') as source:
+                raw_token = source.read(258)
+                if len(raw_token) >= 258:
+                    raise ValueError('Invalid metrics token secret.')
+                token = raw_token.strip()
+        except (OSError, UnicodeError):
+            raise ValueError('Cannot read the metrics token secret.') from None
+    if not token and not token_file and os.environ.get('COURSESPHERE_LOCAL') == '1':
         return ''  # Local development only, and only from a loopback peer.
     if not re.fullmatch(r'[A-Za-z0-9_-]{32,256}', token):
         raise ValueError('Set COURSESPHERE_METRICS_TOKEN to a random URL-safe token of 32 to 256 characters.')
@@ -51,6 +65,10 @@ def configure_observability(app):
     if os.environ.get('PROMETHEUS_MULTIPROC_DIR'):
         raise RuntimeError('This telemetry configuration requires one process per scrape target; multiprocess mode is not supported.')
     app.config['COURSESPHERE_METRICS_TOKEN'] = metrics_token_from_environment()
+    instance = os.environ.get('COURSESPHERE_INSTANCE_ID', 'standalone')
+    if not re.fullmatch(r'[a-z0-9][a-z0-9-]{0,31}', instance):
+        raise ValueError('COURSESPHERE_INSTANCE_ID must be a short lowercase deployment identifier.')
+    app.config['COURSESPHERE_INSTANCE_ID'] = instance
     telemetry = Telemetry()
     app.extensions['telemetry'] = telemetry
     configure_logging(app)
