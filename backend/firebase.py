@@ -7,9 +7,12 @@ from firebase_admin import credentials, auth, db
 from validation import validate_key, validate_messages, validate_profile
 
 if os.environ.get("COURSESPHERE_LOCAL") == "1":
-    # Both SDK services must stay on loopback in the explicitly enabled local mode.
-    os.environ["FIREBASE_AUTH_EMULATOR_HOST"] = "127.0.0.1:9099"
-    os.environ["FIREBASE_DATABASE_EMULATOR_HOST"] = "127.0.0.1:9000"
+     # The alternate host is exclusively the emulator service in the local Compose network.
+    emulator_host = os.environ.get('COURSESPHERE_EMULATOR_HOST', '127.0.0.1')
+    if emulator_host not in {'127.0.0.1', 'firebase-emulators'}:
+        raise ValueError('Invalid local emulator host; use loopback or the Compose emulator service.')
+    os.environ["FIREBASE_AUTH_EMULATOR_HOST"] = f"{emulator_host}:9099"
+    os.environ["FIREBASE_DATABASE_EMULATOR_HOST"] = f"{emulator_host}:9000"
     firebase_app = firebase_admin.initialize_app(options={
         "projectId": "demo-coursesphere",
         "databaseURL": "https://demo-coursesphere-default-rtdb.firebaseio.com",
