@@ -2,6 +2,8 @@
 
 Data: **24/10/2026**. Referência: [OWASP Top 10:2025](https://top10.owasp.org/2025/pt-BR/). A edição foi indicada explicitamente porque a numeração mudou em relação a 2021.
 
+O [relatório consolidado de segurança e confiabilidade](evidence/findings.md), de 27/10/2026, reúne a leitura executiva, as evidências, os SLIs/SLOs e as recomendações priorizadas. As seções abaixo preservam os detalhes da revisão e das correções.
+
 ## Escopo e método
 
 Foram revisados a API Flask, o acesso privilegiado ao Firebase, o frontend React, os módulos SQLite, os scripts de coleta, células relevantes dos notebooks, os manifestos e lockfiles de dependências e a configuração do contêiner. O projeto já tinha alterações locais, que foram mantidas durante a análise e a aplicação das correções.
