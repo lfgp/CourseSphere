@@ -2,7 +2,8 @@
   "name": "coursesphere-local",
   "private": true,
   "scripts": {
-    "emulators": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-emulators.ps1"
+    "emulators": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-emulators.ps1",
+    "test:containers": "node scripts/check-load-balancing.mjs --functional"
   },
   "devDependencies": {
     "firebase-tools": "15.34.1"
