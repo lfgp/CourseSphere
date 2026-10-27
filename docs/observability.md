@@ -2,6 +2,8 @@
 
 Esta etapa adiciona logs JSON, uma sonda de vida do processo e métricas Prometheus à API Flask. Os SLIs usam as operações de perfil e chat que já estão registradas em `backend/endpoints.py`. Login e cadastro acontecem no SDK do Firebase no navegador; a API observa a **verificação de ID tokens**, sem medir o tempo completo do login por senha. O blueprint de cursos continua desativado.
 
+A etapa posterior de [contêineres](containers.md) fornece duas réplicas com um processo por contêiner. Os logs e o header `X-Backend-Instance` identificam a instância por um valor de implantação validado (`backend-1`/`backend-2`). A coleta privada deve consultar cada réplica diretamente, sem passar pelo balanceador. Os resultados de testes desta página permanecem como histórico da etapa de observabilidade.
+
 ## 1. O que foi implementado
 
 | Requisito | Implementação | Evidência |
@@ -89,6 +91,8 @@ Os eventos da aplicação saem em `stdout`. O logger de acesso do Werkzeug não 
 ## 4. Proteger a coleta de métricas
 
 Fora de `COURSESPHERE_LOCAL=1`, a inicialização exige `COURSESPHERE_METRICS_TOKEN`: segredo aleatório de 32 a 256 caracteres de `A-Z`, `a-z`, `0-9`, `_` e `-`. Não é um Firebase ID token. A comparação é feita em tempo constante; valor incorreto/ausente retorna `401`. URLs e corpo não autenticam o scrape.
+
+Desde a etapa de contêineres, também é possível usar `COURSESPHERE_METRICS_TOKEN_FILE` para ler esse mesmo segredo de arquivo montado. As duas fontes são mutuamente exclusivas. Arquivo ausente, vazio, inválido ou excessivo recusa a inicialização; configurar um arquivo vazio não habilita acesso local sem autenticação. O Compose usa essa opção e não envia o segredo ao frontend.
 
 Para reproduzir a coleta protegida em desenvolvimento, gere um segredo **local e ignorado pelo Git**, na raiz do repositório:
 
@@ -290,4 +294,3 @@ A ausência de visibilidade na API foi tratada nos pontos que executam o trabalh
 
 Essa implementação resolve a falta de instrumentação neste processo da aplicação. Ela **não corrige, por si só, vulnerabilidades de autorização, injeção ou credenciais expostas**: essas causas e correções continuam em [vulnerabilities.md](vulnerabilities.md). Centralização de logs, retenção, sondas externas, implantação dos coletores e comprovação dos SLOs continuam sendo responsabilidades operacionais documentadas, sem alegação de que já estejam concluídas.
 
-Os arquivos e os commits locais desta entrega estão separados por parte em [commit-checklist.md](commit-checklist.md).
