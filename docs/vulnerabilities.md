@@ -4,7 +4,7 @@ Data: **24/10/2026**. Referência: [OWASP Top 10:2025](https://top10.owasp.org/2
 
 ## Escopo e método
 
-Foram revisados a API Flask, o acesso privilegiado ao Firebase, o frontend React, os módulos SQLite, os scripts de coleta, células relevantes dos notebooks, os manifestos e lockfiles de dependências e a configuração do contêiner. O projeto já tinha alterações locais; elas foram mantidas e as correções foram aplicadas sobre esse estado, sem restaurar o repositório para `HEAD`.
+Foram revisados a API Flask, o acesso privilegiado ao Firebase, o frontend React, os módulos SQLite, os scripts de coleta, células relevantes dos notebooks, os manifestos e lockfiles de dependências e a configuração do contêiner. O projeto já tinha alterações locais, que foram mantidas durante a análise e a aplicação das correções.
 
 A reprodução usou o cliente de testes do Flask, Firebase simulado, bancos SQLite temporários e os emuladores locais oficiais de Authentication e Realtime Database do projeto fictício `demo-coursesphere`. Não foram feitos ataques ao Firebase de produção nem testes de validade das credenciais expostas.
 
