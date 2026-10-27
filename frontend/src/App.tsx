@@ -1,6 +1,5 @@
-import { initializeApp } from "firebase/app";
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { Box, ThemeProvider } from "@mui/material";
+import { ThemeProvider } from "@mui/material";
 import { createTheme } from '@mui/material/styles';
 import { ToastContainer } from 'react-toastify';
 import Header from "./components/header/Header"
@@ -9,12 +8,9 @@ import Home from "./pages/home/Home";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Login from "./pages/login/Login";
 import SignUp from "./pages/signup/SignUp";
-import firebaseConfig from "./firebaseConfig";
 import 'react-toastify/dist/ReactToastify.css';
 
 
-const app = initializeApp(firebaseConfig);
-console.log(app.name) 
 
 const theme = createTheme({
   palette: {
