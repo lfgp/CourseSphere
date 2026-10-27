@@ -156,7 +156,7 @@ Este é um ambiente de desenvolvimento/demonstração no host local. Não exponh
 
 Imagens base usam tags oficiais de série (`python:3.13-slim`, `node:24-*`, `nginx:stable-alpine`, `redis:8-alpine`, `eclipse-temurin:21-jre-jammy`). Uma reconstrução futura pode receber atualizações dessas tags e dependências transitivas; para promoção controlada, registre os digests, audite as imagens e fixe os artefatos aprovados. Não foi alegado scan completo de vulnerabilidades dos pacotes do sistema operacional das imagens.
 
-## 8. Resultados executados, evidências e commits
+## 8. Resultados executados e evidências
 
 Os seis serviços foram construídos/iniciados com Docker Desktop em modo Linux e ficaram saudáveis. `nginx -t` passou no gateway e no frontend. A demonstração executada enviou oito chamadas `200`: **quatro atendidas por `backend-1` e quatro por `backend-2`**. Os oito IDs foram encontrados tanto no log do gateway quanto no log da API correspondente.
 
