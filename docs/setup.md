@@ -4,6 +4,8 @@ Execute os comandos no PowerShell, a partir da raiz do repositório.
 
 As correções de segurança, suas reproduções e os testes estão em [vulnerabilities.md](vulnerabilities.md).
 
+O relatório consolidado para desenvolvimento, infraestrutura e gestão está em [findings.md](evidence/findings.md), com escopo, metodologia, evidências, prioridades e análise de confiabilidade.
+
 O passo a passo das melhorias adicionais de **rate limiting** e **headers HTTP** está em [security-improvements.md](security-improvements.md).
 
 Logs JSON, `/health`, `/metrics`, SLIs/SLOs e a proposta de dashboard estão em [observability.md](observability.md), com configuração de coleta e passos de validação.
