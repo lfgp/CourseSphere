@@ -215,14 +215,6 @@ Os testes de Redis verificam a seleção da configuração e o comportamento de 
 
 Os relatórios anteriores de 27 testes do backend continuam preservados como histórico da primeira entrega. A etapa atual tem 38 testes no backend e 5 no cliente, além da verificação HTTP dos headers.
 
-## Parte 5 — Commits e checklist
-
-Os arquivos de implementação e os testes são separados por melhoria, com as mensagens:
-
-- `feat(security): limitar requisicoes por IP e consultas por usuario`.
-- `feat(security): aplicar CSP e protecao contra enquadramento`.
-- `docs(security): detalhar melhorias preventivas e atualizar checklist`.
-
 ## Referências
 
 - [Flask-Limiter: instalação e uso](https://flask-limiter.readthedocs.io/en/stable/) e [configuração de armazenamento e limites](https://flask-limiter.readthedocs.io/en/stable/configuration.html).
