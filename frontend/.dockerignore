@@ -3,3 +3,7 @@ dist
 .env*
 *.log
 .git
+**/credentials.json
+**/*-firebase-adminsdk-*.json
+**/reddit_key.json
+**/config.json
