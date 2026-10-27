@@ -5,8 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:local": "vite --mode emulator",
     "build": "tsc -b && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "test": "node --test tests/*.test.cjs",
+    "test:headers": "node scripts/check-security-headers.mjs",
     "preview": "vite preview",
     "sass": "sass --watch src"
   },
@@ -16,16 +19,17 @@
     "@fontsource/roboto": "^5.0.13",
     "@mui/icons-material": "^5.16.0",
     "@mui/material": "^5.16.0",
-    "firebase": "^10.12.3",
+    "firebase": "^13.1.0",
     "framer-motion": "^11.2.13",
-    "jquery": "^3.7.1",
     "react": "^18.3.1",
     "react-card-flip": "^1.2.3",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.24.1",
+    "react-router-dom": "^7.18.4",
     "react-toastify": "^10.0.5",
-    "sass": "^1.77.6",
-    "uuid": "^10.0.0"
+    "sass": "^1.77.6"
+  },
+  "overrides": {
+    "@grpc/grpc-js": "^1.13.6"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
@@ -37,6 +41,6 @@
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",
     "typescript": "^5.2.2",
-    "vite": "^5.3.1"
+    "vite": "^6.4.5"
   }
 }
