@@ -3,7 +3,9 @@
   "private": true,
   "scripts": {
     "emulators": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-emulators.ps1",
-    "test:containers": "node scripts/check-load-balancing.mjs --functional"
+    "test:containers": "node scripts/check-load-balancing.mjs --functional",
+    "security:sca": "node scripts/security-sca.mjs",
+    "test:sca": "node --test scripts/tests/security-sca.test.mjs"
   },
   "devDependencies": {
     "firebase-tools": "15.34.1"
