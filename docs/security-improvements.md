@@ -11,6 +11,8 @@ Os exemplos da atividade são alternativas: o requisito de pelo menos duas melho
 
 A etapa posterior de [observabilidade](observability.md) adiciona logs JSON, `/health` e `/metrics`. Essas duas rotas e `OPTIONS` ficam isentas das cotas de negócio; o acesso às métricas tem proteção própria. As evidências e os números de testes abaixo permanecem como histórico desta etapa de segurança.
 
+O [ambiente Docker Compose](containers.md) posterior usa Redis compartilhado por socket Unix (`redis+unix://`), sem TCP. Esse transporte foi adicionado sem liberar Redis remoto em texto claro. No Compose, o Waitress aceita informações de encaminhamento somente do IP do Nginx, que sobrescreve os headers do cliente; os testes anteriores sem proxy continuam recusando headers de encaminhamento arbitrários.
+
 ## Parte 1 — Instalar as dependências
 
 Na raiz do repositório, com o ambiente virtual preparado conforme [setup.md](setup.md):
@@ -220,8 +222,6 @@ Os arquivos de implementação e os testes são separados por melhoria, com as m
 - `feat(security): limitar requisicoes por IP e consultas por usuario`.
 - `feat(security): aplicar CSP e protecao contra enquadramento`.
 - `docs(security): detalhar melhorias preventivas e atualizar checklist`.
-
-Os identificadores e os arquivos de cada parte estão na [checklist atualizada](commit-checklist.md). As alterações locais anteriores de classificação, o agregador de requisitos e o rascunho de findings continuam separados.
 
 ## Referências
 
