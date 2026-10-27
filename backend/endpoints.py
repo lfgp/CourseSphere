@@ -60,6 +60,7 @@ limiter = configure_rate_limiting(app)
 def secure_response(response):
     apply_security_headers(response)
     response.headers['X-Request-ID'] = g.request_id
+    response.headers['X-Backend-Instance'] = app.config['COURSESPHERE_INSTANCE_ID']
     return response
 
 
