@@ -7,3 +7,6 @@ A branch analisys foi criada para avaliação e melhoria do código para o desaf
 
 ## Ajustes do CI ##
 Últimas modificações nessa branch foram para correção do CI.
+
+## documentação ##
+Toda documentação está presente na pasta docs
